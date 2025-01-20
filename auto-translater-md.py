@@ -4,7 +4,9 @@ import openai  # pip install openai
 import sys
 import re
 import yaml  # pip install PyYAML
+import json
 import env
+
 
 # 设置 OpenAI API Key 和 API Base 参数，通过 env.py 传入
 openai.api_key = os.environ.get("CHATGPT_API_KEY")
@@ -15,23 +17,18 @@ max_length = 1800
 
 # 设置翻译的路径
 dir_to_translate = "testdir/to-translate"
-dir_translated = {
-    "en": "testdir/docs/en",
-    "es": "testdir/docs/es",
-    "ar": "testdir/docs/ar"
-}
+dir_out_translate = 'testdir/docs/md'
 
 # 不进行翻译的文件列表
 exclude_list = ["index.md", "Contact-and-Subscribe.md", "WeChat.md"]
 # 已处理的 Markdown 文件名的列表，会自动生成
 processed_list = "processed_list.txt"
 
-# 由 ChatGPT 翻译的提示
-tips_translated_by_chatgpt = {
-    "en": "\n\n> This post is translated using ChatGPT, please [**feedback**](https://github.com/linyuxuanlin/Wiki_MkDocs/issues/new) if any omissions.",
-    "es": "\n\n> Este post está traducido usando ChatGPT, por favor [**feedback**](https://github.com/linyuxuanlin/Wiki_MkDocs/issues/new) si hay alguna omisión.",
-    "ar": "\n\n> تمت ترجمة هذه المشاركة باستخدام ChatGPT، يرجى [**تزويدنا بتعليقاتكم**](https://github.com/linyuxuanlin/Wiki_MkDocs/issues/new) إذا كانت هناك أي حذف أو إهمال."
-}
+# 目标语言列表
+languages = json.loads(os.environ.get("LANGUAGE_LIST"))
+
+# 语言映射字典
+lang_dict = json.loads(os.environ.get("LANGUAGE_DICT"))
 
 # 文章使用英文撰写的提示，避免本身为英文的文章被重复翻译为英文
 marker_written_in_en = "\n> This post was originally written in English.\n"
@@ -134,20 +131,18 @@ def front_matter_replace(value, lang):
         # print(f"element[{index}] = {element}")
         for replacement in front_matter_replace_rules:
             if replacement["orginal_text"] in element:
+                # 检查 replaced_text 中 lang 对应的值是否为空，如果为空则使用 'en' 的值
+                text_to_use = replacement["replaced_text"].get(lang) or replacement["replaced_text"].get('en')
                 # 使用 replace 函数逐个替换
                 element = element.replace(
-                    replacement["orginal_text"], replacement["replaced_text"][lang])
+                    replacement["orginal_text"], text_to_use)
         value[index] = element
         # print(f"element[{index}] = {element}")
     return value
 
 # 定义调用 ChatGPT API 翻译的函数
 def translate_text(text, lang, type):
-    target_lang = {
-        "en": "English",
-        "es": "Spanish",
-        "ar": "Arabic"
-    }[lang]
+    target_lang = lang_dict.get(lang)
     
     # Front Matter 与正文内容使用不同的 prompt 翻译
     # 翻译 Front Matter。
@@ -219,11 +214,10 @@ def translate_file(input_file, filename, lang):
     sys.stdout.flush()
 
     # 定义输出文件
-    if lang in dir_translated:
-        output_dir = dir_translated[lang]
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir)
-        output_file = os.path.join(output_dir, filename)
+    output_dir = dir_out_translate+'/'+lang
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    output_file = os.path.join(output_dir, filename)
 
     # 读取输入文件内容
     with open(input_file, "r", encoding="utf-8") as f:
@@ -231,11 +225,12 @@ def translate_file(input_file, filename, lang):
 
     # 创建一个字典来存储占位词和对应的替换文本
     placeholder_dict = {}
-
+    
     # 使用 for 循环应用替换规则，并将匹配的文本替换为占位词
     for i, rule in enumerate(replace_rules):
+        text_to_use = rule["replaced_text"].get(lang) or rule["replaced_text"].get('en')
         find_text = rule["orginal_text"]
-        replace_with = rule["replaced_text"][lang]
+        replace_with = text_to_use
         placeholder = f"[to_be_replace[{i + 1}]]"
         input_text = input_text.replace(find_text, placeholder)
         placeholder_dict[placeholder] = replace_with
@@ -307,13 +302,6 @@ def translate_file(input_file, filename, lang):
         # 加入 Front Matter
         output_text = "---\n" + front_matter_text_processed + "---\n\n" + output_text
 
-    # 加入由 ChatGPT 翻译的提示
-    if lang == "en":
-        output_text = output_text + tips_translated_by_chatgpt["en"]
-    elif lang == "es":
-        output_text = output_text + tips_translated_by_chatgpt["es"]
-    elif lang == "ar":
-        output_text = output_text + tips_translated_by_chatgpt["ar"]
 
     # 最后，将占位词替换为对应的替换文本
     for placeholder, replacement in placeholder_dict.items():
@@ -349,28 +337,16 @@ try:
                 processed_list_content = f.read()
 
             if marker_force_translate in md_content:  # 如果有强制翻译的标识，则执行这部分的代码
-                if marker_written_in_en in md_content:  # 翻译为除英文之外的语言
-                    print("Pass the en-en translation: ", filename)
-                    sys.stdout.flush()
-                    translate_file(input_file, filename, "es")
-                    translate_file(input_file, filename, "ar")
-                else:  # 翻译为所有语言
-                    translate_file(input_file, filename, "en")
-                    translate_file(input_file, filename, "es")
-                    translate_file(input_file, filename, "ar")
+                for trs_lang in languages:
+                    translate_file(input_file, filename, trs_lang)
             elif filename in exclude_list:  # 不进行翻译
                 print(f"Pass the post in exclude_list: {filename}")
                 sys.stdout.flush()
             elif filename in processed_list_content:  # 不进行翻译
                 print(f"Pass the post in processed_list: {filename}")
                 sys.stdout.flush()
-            elif marker_written_in_en in md_content:  # 翻译为除英文之外的语言
-                print(f"Pass the en-en translation: {filename}")
-                sys.stdout.flush()
-                for lang in ["es", "ar"]:
-                    translate_file(input_file, filename, lang)
             else:  # 翻译为所有语言
-                for lang in ["en", "es", "ar"]:
+                for lang in languages:
                     translate_file(input_file, filename, lang)
 
             # 将处理完成的文件名加到列表，下次跳过不处理
