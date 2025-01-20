@@ -8,7 +8,7 @@ Auto-i18n-Plus 是一个使用 ChatGPT 自动将 Markdown 文件和 JSON 文件�
 
 Auto-i18n-Plus 支持 Markdown 文件翻译：
 
-- **支持更多语种翻译**：Auto-i18n-Plus 支持几乎所有语种的翻译，目前预设语种已达到 30 种，如果想要增加更多翻译语种，只要修改配置文件`env.py`增加即可。
+- **支持更多语种翻译**：Auto-i18n-Plus 支持几乎所有语种的翻译，目前预设语种已达到 30 种，如果想要增加更多翻译语种，只要修改配置文件`env.yaml`增加即可。
 - **批量多语言翻译**：Auto-i18n-Plus 提供了批量翻译的功能，使你能够将一整个路径下的所有 Markdown 和 JSON 文件一次性翻译多语言，极大地提高了多语言化项目的效率。
 - **兼容 Front Matter**：Auto-i18n-Plus 兼容 Markdown Front Matter 语法，你可以自定义不同字段的翻译或替换规则。
 - **固定内容替换**：Auto-i18n-Plus 还支持固定内容替换。如果你希望文档中一些重复字段的译文保持不变，这个功能可以帮助你实现文档的一致性。
@@ -16,7 +16,7 @@ Auto-i18n-Plus 支持 Markdown 文件翻译：
 
 ### 快速上手
 
-1. 将仓库克隆到本地，把 `env_template.py` 重命名为 `env.py`，并提供你的 ChatGPT API。
+1. 将仓库克隆到本地，把 `env_template.yaml` 重命名为 `env.yaml`，并提供你的 ChatGPT API。
 
 > 如果你没有自己的 API，可以到 [GPT_API_free](https://github.com/chatanywhere/GPT_API_free) 申请到一个免费的；
 > 也可以借助 [go-chatgpt-api](https://github.com/linweiyuan/go-chatgpt-api) 把网页版 ChatGPT 转 API 使用。
@@ -37,6 +37,44 @@ Auto-i18n 也可以批量翻译 JSON 文件。对于 JSON 文件翻译，程序�
 ### 快速上手
 
 执行命令 `python auto-translater-json.py` 运行程序，它将会自动处理测试目录 `testdir/to-translate` 下的所有 JSON 文件，执行翻译。
+
+## 多语言
+
+当前已配置的翻译输出的多语言：
+
+| Language Code | Language Name        |
+| ------------- | -------------------- |
+| ar            | Arabic               |
+| bg            | Bulgarian            |
+| cs            | Czech                |
+| da            | Danish               |
+| de            | German               |
+| es            | Spanish              |
+| fi            | Finnish              |
+| fr            | French               |
+| hi            | Hindi                |
+| hu            | Hungarian            |
+| id            | Indonesian           |
+| it            | Italian              |
+| ja            | Japanese             |
+| ko            | Korean               |
+| ms            | Malay                |
+| nl            | Dutch                |
+| no            | Norwegian            |
+| pl            | Polish               |
+| pt            | Portuguese           |
+| ro            | Romanian             |
+| ru            | Russian              |
+| sv            | Swedish              |
+| sk            | Slovak               |
+| sr            | Serbian              |
+| tl            | Tagalog              |
+| tr            | Turkish              |
+| uz            | Uzbek                |
+| vi            | Vietnamese           |
+| zh-CN         | Chinese (Simplified) |
+
+> 你可以修改`env.yaml`文件增减多语言配置
 
 ## GitHub Actions 自动化指南
 

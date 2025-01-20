@@ -4,13 +4,19 @@ import openai  # pip install openai
 import sys
 import re
 import yaml  # pip install PyYAML
-import json
-import env
 
 
-# 设置 OpenAI API Key 和 API Base 参数，通过 env.py 传入
-openai.api_key = os.environ.get("CHATGPT_API_KEY")
-openai.api_base = os.environ.get("CHATGPT_API_BASE")
+# 读取 ENV YAML 文件
+with open("env.yaml", "r", encoding="utf-8") as file:
+    env_data = yaml.safe_load(file)
+
+# 设置 OpenAI API Key 和 API Base 参数，通过 env.yaml 传入
+openai.api_key = env_data["CHATGPT_API_KEY"]
+openai.api_base = env_data["CHATGPT_API_BASE"]
+# 目标语言列表
+languages = env_data["LANGUAGE_LIST"]
+# 语言映射字典
+lang_dict = env_data["LANGUAGE_DIST"]
 
 # 设置最大输入字段，超出会拆分输入，防止超出输入字数限制
 max_length = 1800
@@ -24,11 +30,7 @@ exclude_list = ["index.md", "Contact-and-Subscribe.md", "WeChat.md"]
 # 已处理的 Markdown 文件名的列表，会自动生成
 processed_list = "processed_list.txt"
 
-# 目标语言列表
-languages = json.loads(os.environ.get("LANGUAGE_LIST"))
 
-# 语言映射字典
-lang_dict = json.loads(os.environ.get("LANGUAGE_DICT"))
 
 # 文章使用英文撰写的提示，避免本身为英文的文章被重复翻译为英文
 marker_written_in_en = "\n> This post was originally written in English.\n"

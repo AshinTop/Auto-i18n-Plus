@@ -1,4 +1,4 @@
-env.py
+env.yaml
 __pycache__
 processed_list.txt
 testdir/docs/

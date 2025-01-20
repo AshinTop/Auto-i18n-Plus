@@ -5,11 +5,19 @@ import sys
 import json
 from concurrent.futures import ThreadPoolExecutor, as_completed  # 并行化处理
 from tqdm import tqdm  # 导入 tqdm 用于显示进度条
-import env
+import yaml  # pip install PyYAML
 
-# 设置 OpenAI API Key 和 API Base 参数，通过 env.py 传入
-openai.api_key = os.environ.get("CHATGPT_API_KEY")
-openai.api_base = os.environ.get("CHATGPT_API_BASE")
+# 读取 ENV YAML 文件
+with open("env.yaml", "r", encoding="utf-8") as file:
+    env_data = yaml.safe_load(file)
+
+# 设置 OpenAI API Key 和 API Base 参数，通过 env.yaml 传入
+openai.api_key = env_data["CHATGPT_API_KEY"]
+openai.api_base = env_data["CHATGPT_API_BASE"]
+# 目标语言列表
+languages = env_data["LANGUAGE_LIST"]
+# 语言映射字典
+lang_dict = env_data["LANGUAGE_DIST"]
 
 # 设置最大输入字段，超出会拆分输入，防止超出输入字数限制
 max_length = 1800
@@ -20,12 +28,6 @@ dir_out_translate = 'testdir/docs/json'
 
 # 即使在已处理的列表中，仍需要重新翻译的标记
 marker_force_translate = "\n[translate]\n"
-
-# 目标语言列表
-languages = json.loads(os.environ.get("LANGUAGE_LIST"))
-
-# 语言映射字典
-lang_dict = json.loads(os.environ.get("LANGUAGE_DICT"))
 
 # 定义调用 ChatGPT API 翻译的函数
 def translate_text(text, lang):
