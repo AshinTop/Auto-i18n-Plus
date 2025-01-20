@@ -1,5 +1,7 @@
 # Auto-i18n-Plus: An Automated Multilingual Translation Tool Using ChatGPT
 
+[English](./README.md) | [中文](./README-ZH.md)
+
 Auto-i18n-Plus is a tool that uses ChatGPT to automatically translate Markdown and JSON files into multiple languages. It enables the internationalization (i18n) of blog articles and website content. Simply push the Markdown or JSON files that need translation to a GitHub repository, and with the help of GitHub Actions, the files will be automatically translated into multiple languages.
 
 ## Markdown File Translation

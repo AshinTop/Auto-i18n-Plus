@@ -1,5 +1,7 @@
 # Auto-i18n-Plus：使用 ChatGPT 的自动多语言翻译工具
 
+[English](./README.md) | [中文](./README-ZH.md)
+
 Auto-i18n-Plus 是一个使用 ChatGPT 自动将 Markdown 文件和 JSON 文件批量翻译为多语言的工具。它实现了博客文章和网站内容的国际化（i18n）。你仅需将需要翻译的 将 Markdown 文件 或 JSON 文件推送至 GitHub 仓库，即可借助 GitHub Actions 实现自动转译为多种语言。
 
 ## Markdown 文件翻译
