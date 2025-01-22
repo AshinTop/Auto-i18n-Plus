@@ -1,0 +1,2 @@
+pyinstaller --onefile auto-translater-md.py
+pyinstaller --onefile auto-translater-json.py

@@ -3,3 +3,5 @@ __pycache__
 processed_list.txt
 testdir/docs/
 .vscode/settings.json
+dist
+build

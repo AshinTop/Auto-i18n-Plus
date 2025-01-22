@@ -62,3 +62,5 @@ LANGUAGE_DIST:
   uz: 'Uzbek'
   vi: 'Vietnamese'
   zh-CN: 'Chinese (Simplified)'
+
+GAME_NAME: 'Swerve'
