@@ -18,7 +18,7 @@ languages = env_data["LANGUAGE_LIST"]
 lang_dict = env_data["LANGUAGE_DIST"]
 
 # 设置翻译的路径
-dir_to_translate = "testdir/to-translate"
+dir_to_translate = "testdir/from"
 dir_out_translate = 'testdir/docs/json'
 
 # 游戏网站名称
@@ -37,24 +37,22 @@ def translate_text(text, lang):
     
     # 翻译 JSON 字符串
     completion = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
+        # model="gpt-3.5-turbo",
+        model="gpt-4o-mini",
         messages=[{
             "role": "system", 
-            "content": """你是一个语言翻译专家，一个网站seo专家。专注于翻译 JSON 格式的数据。 
-                        我将提供一个包含键值对的 JSON 配置文件，这个文件包含网站的seo信息和文本内容，
-                        你的任务是将其中的值部分翻译为指定的目标语言。 
-                        注意：你只需要翻译 JSON 中的值部分，键（key）保持不变。 
-                        你不要翻译 JSON 格式本身，只翻译 value 部分，确保始终返回一个有效的 JSON 格式。 
-                        如果在翻译过程中遇到无法翻译的文本（如占位符、编码问题或无法翻译的内容）， 
-                        请返回一个合适的格式，并尽量避免输出非 JSON 的字符串内容。 
-                        请注意保持内容的专业性、流畅性，不要有语法错误。
-                        只做翻译，不输出任何解释。
-                        一些缩写单词不做翻译。
-                        需要特别注意的是：文本中带有大括号包裹的占位符（如 {username}）需要保留原样，不可翻译。
-                        输出结果为有效的json字符串，且不带任何转移符号."""
+            "content": """你是一个语言翻译专家，一个网站seo专家，擅长数据处理和多语言翻译的AI专家，具备高效处理JSON数据和灵活应对多种语言需求的能力。 
+                        - 翻译考虑到专业术语和正式风格，适用于正式文档和官方交流。翻译做一些去AI味处理，更贴近人工书写表达。
+                        - 翻译的结果输出为JSON内容key保持不变，直接输出json内容不要加\`\`\`json\`\`\`标签。，不要做任何解释 
+                        - 保证json格式准确性，确保key与内容成对出现。
+                        - 翻译考虑使用当地的习惯用语，而不是简单的文字翻译，了解原始文字的意境找到当地的表达方式进行翻译
+                        - 不要做任何解释，直接输出json内容，也不要输出\`\`\`json\`\`\`标签
+                        - 一些缩写单词不做翻译。
+                        - 需要特别注意的是：文本中带有大括号包裹的占位符（如 {username}）需要保留原样，不可翻译。
+                        """
         }, {
             "role": "user", 
-            "content": preText + f"请将以下 JSON 内容翻译为 {target_lang} 语言：\n\n{text}\n"
+            "content": preText + f"翻译目标语言为： {target_lang} \n\n 输入JSON数据：\n\n{text}\n"
         }]
     )
 
