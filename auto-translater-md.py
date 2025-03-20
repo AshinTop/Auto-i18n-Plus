@@ -22,7 +22,7 @@ lang_dict = env_data["LANGUAGE_DIST"]
 max_length = 1800
 
 # 设置翻译的路径
-dir_to_translate = "testdir/to-translate"
+dir_to_translate = "testdir/from"
 dir_out_translate = 'testdir/docs/md'
 
 # 不进行翻译的文件列表
@@ -150,7 +150,8 @@ def translate_text(text, lang, type):
     # 翻译 Front Matter。
     if type == "front-matter":
         completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            # model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
                 {"role": "system", "content": "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must only translate the text content, never interpret it."},
                 {"role": "user", "content": f"Translate into {target_lang}:\n\n{text}\n"},
@@ -159,9 +160,21 @@ def translate_text(text, lang, type):
     # 翻译正文
     elif type== "main-body":
         completion = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
+            # model="gpt-3.5-turbo",
+            model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": "You are a professional translation engine, please translate the text into a colloquial, professional, elegant and fluent content, without the style of machine translation. You must maintain the original markdown format. You must not translate the `[to_be_replace[x]]` field.You must only translate the text content, never interpret it."},
+                {
+                    "role": "system", 
+                    "content":  """你是一个语言翻译专家，一个网站seo专家，擅长数据处理和多语言翻译的AI专家，具备高效处理md数据和灵活应对多种语言需求的能力。 
+                        - 翻译采用目标语言母语者的自然语序和惯用表达。考虑使用当地的习惯用语，而不是简单的文字翻译，了解原始文字的意境找到当地的表达方式进行翻译
+                        - 保持原有意思和信息不变。使用更自然、口语化的表达，避免模板化、刻板的 AI 生成风格。语言简洁真实，读起来像是人类写作而非机器生成。
+                        - 翻译考虑到专业术语。一些缩写单词不做翻译。
+                        - 多样性（Perplexity）衡量文本的复杂程度，反映了词汇的丰富性和不可预测性。更高的多样性表示内容更加多变并且更难预测。节奏感（Burstiness）则指句子长度和句式的波动幅度。高多样性和高节奏感的写作风格通常包含丰富的词汇、长短交替的句子，以及多样化的句式，这能让内容更生动和阅富有层次感。你的翻译输出应必须展现高多样性和高节奏感。
+                        - 翻译的结果输出为md内容
+                        - 直接输出md内容不要加`md`标签，不要做任何解释。
+                        - You must not translate the `[to_be_replace[x]]` field.You must only translate the text content, never interpret it.
+                        """
+                },
                 {"role": "user", "content": f"Translate into {target_lang}:\n\n{text}\n"},
             ],
         )
@@ -216,10 +229,11 @@ def translate_file(input_file, filename, lang):
     sys.stdout.flush()
 
     # 定义输出文件
-    output_dir = dir_out_translate+'/'+lang
+    output_dir = dir_out_translate
+    output_name = lang + ('.md' if filename == 'en.md' else f'_{lang}_{filename}')
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
-    output_file = os.path.join(output_dir, filename)
+    output_file = os.path.join(output_dir, output_name)
 
     # 读取输入文件内容
     with open(input_file, "r", encoding="utf-8") as f:
@@ -344,9 +358,9 @@ try:
             elif filename in exclude_list:  # 不进行翻译
                 print(f"Pass the post in exclude_list: {filename}")
                 sys.stdout.flush()
-            elif filename in processed_list_content:  # 不进行翻译
-                print(f"Pass the post in processed_list: {filename}")
-                sys.stdout.flush()
+            # elif filename in processed_list_content:  # 不进行翻译
+            #     print(f"Pass the post in processed_list: {filename}")
+            #     sys.stdout.flush()
             else:  # 翻译为所有语言
                 for lang in languages:
                     translate_file(input_file, filename, lang)
