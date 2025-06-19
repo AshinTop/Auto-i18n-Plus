@@ -33,27 +33,36 @@ site_game_name = env_data['GAME_NAME']
 def translate_text(text, lang):
     target_lang = lang_dict.get(lang)
 
-    preText = (f'这是{site_game_name}游戏网站的配置文件' if site_game_name  else '')
+    preText = f"This is the configuration file for the {site_game_name} game website." if site_game_name else ''
     
     # 翻译 JSON 字符串
     completion = openai.ChatCompletion.create(
         # model="gpt-3.5-turbo",
         model="gpt-4o-mini",
-        messages=[{
-            "role": "system", 
-            "content": """你是一个语言翻译专家，一个网站seo专家，擅长数据处理和多语言翻译的AI专家，具备高效处理JSON数据和灵活应对多种语言需求的能力。 
-                        - 翻译采用目标语言母语者的自然语序和惯用表达。考虑使用当地的习惯用语，而不是简单的文字翻译，了解原始文字的意境找到当地的表达方式进行翻译
-                        - 保持原有意思和信息不变。使用更自然、口语化的表达，避免模板化、刻板的 AI 生成风格。语言简洁真实，读起来像是人类写作而非机器生成。
-                        - 翻译考虑到专业术语。一些缩写单词不做翻译。
-                        - 文本中带有大括号包裹的占位符（如 {username}）需要保留原样，不做翻译。
-                        - 翻译的结果输出为JSON内容，key保持不变，只翻译value，保证json格式准确性，确保key与内容成对出现。
-                        - 多样性（Perplexity）衡量文本的复杂程度，反映了词汇的丰富性和不可预测性。更高的多样性表示内容更加多变并且更难预测。节奏感（Burstiness）则指句子长度和句式的波动幅度。高多样性和高节奏感的写作风格通常包含丰富的词汇、长短交替的句子，以及多样化的句式，这能让内容更生动和阅富有层次感。你的翻译输出应必须展现高多样性和高节奏感。
-                        - 直接输出json内容不要加`json`标签，不要做任何解释。
+        messages=[
+        {
+            "role": "system",
+            "content": """🚫 Do NOT include any code block markers such as ```json, ```, or <code>. Output a clean and valid JSON string only, without any explanations, comments, or extra formatting.
+
+                        You are an expert in website SEO, language localization, and multilingual translation, with advanced skills in processing JSON data accurately. Please translate only the **values** in the provided JSON input. Keep all **keys unchanged**, and ensure the output is a structurally valid JSON object.
+
+                        Instructions for translation:
+
+                        - Use natural, expressive, and native-level language in the target language, reflecting the tone of game bloggers or gaming communities.
+                        - The value of the "name" key represents the game title. It should NEVER be translated.
+                        - If the exact text of the "name" value appears in other fields (such as description), do NOT translate it there either. Keep the game title intact wherever it appears.
+                        - Do not translate game names, abbreviations (e.g., RPG, PvP), or placeholder variables enclosed in curly brackets (e.g., {username}).
+                        - Do not perform literal word-for-word translation; instead, convey the original meaning using locally common phrases or idioms.
+                        - The writing style should reflect **high Perplexity** (rich, diverse vocabulary) and **high Burstiness** (variation in sentence length and structure).
+                        - Avoid rigid, templated, or robotic AI-sounding phrasing.
+                        - Output should be valid JSON with keys unchanged and only the values translated. No additional text or formatting.
                         """
-        }, {
-            "role": "user", 
-            "content": preText + f"翻译目标语言为： {target_lang} \n\n 输入JSON数据：\n\n{text}\n"
-        }]
+        },
+        {
+            "role": "user",
+            "content": f"{preText}\nTarget language: {target_lang}\nTranslate the following JSON (only values, keep keys unchanged):\n{text}"
+        }
+    ]
     )
 
     # 获取翻译结果
