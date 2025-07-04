@@ -1,0 +1,20 @@
+CHATGPT_API_KEY: 'sk-xxxx'
+CHATGPT_API_BASE: 'xxx' # e.g. 官方API地址：https://api.openai.com/v1/
+LANGUAGE_LIST:
+  - 'de'
+  - 'es'
+  - 'fr'
+  - 'ja'
+  - 'pt'
+  - 'ru'
+  - 'zh-CN'
+  - 'zh-TW'
+LANGUAGE_DIST:
+  de: 'Deutsch'
+  es: 'Español'
+  fr: 'Français'
+  ja: '日本語'
+  pt: 'Português'
+  ru: 'Русский'
+  zh-CN: '中文（简体）'
+  zh-TW: '中文（繁体）'
